@@ -41,12 +41,10 @@ public class ModEventListener {
     @Getter
     @Setter
     protected static int tickRestart = -1;
-    protected static boolean shouldRestart = false;
     public static int tickForPlannedRestart = 0;
 
     @SuppressWarnings("unchecked")
     public static void cleanItemsTickEvent(MinecraftServer server) {
-        if (shouldRestart) return;
         tickClean--;
         if (tickClean == 6000) sendChatMessageToAll(server.getPlayerManager().getPlayerList(), getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle()).append(getStyledComponent(" 5 минут до очистки предметов.", TextStyleUtil.WHITE.getStyle())));
         if (tickClean == 1200) sendChatMessageToAll(server.getPlayerManager().getPlayerList(), getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle()).append(getStyledComponent(" 1 минута до очистки предметов.", TextStyleUtil.WHITE.getStyle())));
@@ -94,7 +92,6 @@ public class ModEventListener {
             );
             return;
         }
-        shouldRestart = true;
 
         if (seconds == 30 && tickRestart % 20 == 0) {
             sendChatMessageToAll(
@@ -124,7 +121,6 @@ public class ModEventListener {
 
         if (tickRestart == 0) {
             tickRestart = -1;
-            shouldRestart = false;
             server.getPlayerManager().getPlayerList().forEach(serverPlayer -> serverPlayer.networkHandler.disconnect(getStyledComponent("Перезагрузка сервера...", TextStyleUtil.DARK_AQUA.getStyle())));
             server.stop(false);
         }

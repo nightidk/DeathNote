@@ -1,13 +1,17 @@
 package ru.nightidk.utils;
 
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import ru.nightidk.DeathNote;
 
 import java.util.List;
 import java.util.ListIterator;
+
+import static ru.nightidk.utils.JDAMessageUtil.sendChatMessage;
 
 public class ChatMessageUtil {
     public static void sendChatMessageToAll(List<ServerPlayerEntity> playerList, Text message) {
@@ -21,6 +25,12 @@ public class ChatMessageUtil {
             }
             else break;
         }
+        DeathNote.LOGGER.info("[DeathNote] {}", message.getString());
+        sendChatMessage("1250613189658411009",
+                new MessageCreateBuilder()
+                        .setContent(message.getString())
+                        .build()
+        );
     }
 
     public static void sendChatMessageToAll(List<ServerPlayerEntity> source, String message) {
