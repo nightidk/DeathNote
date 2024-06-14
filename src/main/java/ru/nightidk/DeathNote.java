@@ -1,11 +1,14 @@
 package ru.nightidk;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import dev.architectury.event.events.common.PlayerEvent;
 import dev.architectury.platform.Platform;
 import lombok.SneakyThrows;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.fabricmc.api.ModInitializer;
@@ -13,49 +16,63 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.fabricmc.fabric.mixin.container.ServerPlayerEntityMixin;
+import net.fabricmc.fabric.mixin.event.interaction.ServerPlayerInteractionManagerMixin;
 import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.nightidk.commands.AuthCommand;
 import ru.nightidk.commands.ConfigReload;
 import ru.nightidk.commands.MaintanceCommand;
 import ru.nightidk.commands.RestartCommand;
+import ru.nightidk.configuration.AuthVariables;
 import ru.nightidk.configuration.ConfigVariables;
 import ru.nightidk.jda.BaseEmbed;
 import ru.nightidk.jda.MessageListener;
+import ru.nightidk.listeners.AuthEventListener;
 import ru.nightidk.listeners.ModEventListener;
 
 import java.awt.*;
 import java.io.*;
 import java.util.Properties;
 
-import static ru.nightidk.jda.MessageUtil.editStatusMessage;
+import static ru.nightidk.utils.JDAMessageUtil.editStatusMessage;
 
 public class DeathNote implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger("deathnote");
 	public static MinecraftServer server;
 	public static File configFile;
 	public static JDA jda;
+	public static File authFile;
+
 
 	@SneakyThrows
     @Override
 	public void onInitialize() {
-//		ServerLifecycleEvents.SERVER_STARTED.register(server1 -> {
-//			server = server1;
-//		});
-//		ArgumentTypeRegistry.registerArgumentType(
-//				new ResourceLocation("deathnote", "playerarg"),
-//				PlayerArgumentType.class, SingletonArgumentInfo.contextFree(PlayerArgumentType::reference));
 		LOGGER.info("[DeathNote] Loading config file...");
 		configFile = new File(Platform.getConfigFolder().toFile(), "deathnote.properties");
 		loadConfig(configFile);
 		LOGGER.info("[DeathNote] Finished loading config file.");
 
+		LOGGER.info("[DeathNote] Loading auth file...");
+		File directory = new File(Platform.getModsFolder().toFile() + "/deathnote");
+		if (!directory.exists())
+			if (!directory.mkdirs())
+				throw new RuntimeException("[DeathNote] Error creating directory for auth config.");
+		authFile = new File(Platform.getModsFolder().toFile() + "/deathnote/", "auth.json");
+		loadAuth(authFile);
+		LOGGER.info("[DeathNote] Finished loading auth file.");
+
+
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			ConfigReload.register(dispatcher);
 			RestartCommand.register(dispatcher);
 			MaintanceCommand.register(dispatcher);
+			AuthCommand.register(dispatcher);
 		});
 		LOGGER.info("[DeathNote] Commands registered.");
 
@@ -110,11 +127,41 @@ public class DeathNote implements ModInitializer {
 		ServerPlayConnectionEvents.INIT.register(ModEventListener::joinServerEvent);
 		ServerPlayConnectionEvents.JOIN.register(ModEventListener::joinedServerEvent);
 		ServerPlayConnectionEvents.DISCONNECT.register(ModEventListener::disconnectServerEvent);
+
+		// AUTH EVENTS
+		UseEntityCallback.EVENT.register(AuthEventListener::useEntityEvent);
+		PlayerBlockBreakEvents.BEFORE.register(AuthEventListener::breakBlockEvent);
+		UseBlockCallback.EVENT.register(AuthEventListener::useBlockEvent);
+		AttackEntityCallback.EVENT.register(AuthEventListener::attackEntityEvent);
+		UseItemCallback.EVENT.register(AuthEventListener::useItemEvent);
+		ServerMessageEvents.ALLOW_CHAT_MESSAGE.register(ModEventListener::allowChatMessage);
+
 		ModEventListener.setTickClean(ConfigVariables.TICK_FOR_CLEAN);
 		ModEventListener.setTickRestart(ConfigVariables.RESTART_TIME);
 		LOGGER.info("[DeathNote] Server tick event registered.");
 
         LOGGER.info("[DeathNote] Initialized.");
+	}
+
+	public static void loadAuth(File file) {
+		try {
+			if (!file.exists() || !file.canRead())
+				saveAuth(file);
+			FileReader fis = new FileReader(file);;
+			AuthVariables.JSON_AUTH = (JsonObject) JsonParser.parseReader(fis);
+			fis.close();
+		}  catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.info("[DeathNote] Something goes wrong when loading auth file.");
+		}
+	}
+
+	public static void saveAuth(File file) throws IOException {
+		FileOutputStream fos = new FileOutputStream(file, false);
+		if (AuthVariables.JSON_AUTH.size() == 0)
+			AuthVariables.JSON_AUTH.add("users", new JsonArray());
+		fos.write(AuthVariables.JSON_AUTH.toString().getBytes());
+		fos.close();
 	}
 
 	public static void loadConfig(File file) {

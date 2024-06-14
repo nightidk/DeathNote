@@ -1,40 +1,38 @@
 package ru.nightidk.utils;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 
 import java.util.List;
 import java.util.ListIterator;
 
 public class ChatMessageUtil {
-    public static void sendChatMessageToAll(PlayerList playerList, Component message) {
-        List<ServerPlayer> list1 = playerList.getPlayers();
-        ListIterator<ServerPlayer> iterator = list1.listIterator();
+    public static void sendChatMessageToAll(List<ServerPlayerEntity> playerList, Text message) {
+        ListIterator<ServerPlayerEntity> iterator = playerList.listIterator();
         while(true)
         {
             if(iterator.hasNext())
             {
-                Player TmpPlayer = iterator.next();
-                TmpPlayer.sendSystemMessage(message);
+                ServerPlayerEntity TmpPlayer = iterator.next();
+                TmpPlayer.sendMessage(message);
             }
             else break;
         }
     }
 
-    public static void sendChatMessageToAll(PlayerList playerList, String message) {
-        sendChatMessageToAll(playerList, Component.literal(message));
+    public static void sendChatMessageToAll(List<ServerPlayerEntity> source, String message) {
+        sendChatMessageToAll(source, Text.literal(message));
     }
 
-    public static void sendChatMessageToPlayer(ServerPlayer serverPlayer, String message) {
-        ((Player) serverPlayer).sendSystemMessage(Component.literal(message));
+    public static void sendChatMessageToPlayer(ServerPlayerEntity serverPlayer, String message) {
+        serverPlayer.sendMessage(Text.literal(message));
     }
 
-    public static void sendChatMessageToPlayer(ServerPlayer serverPlayer, Component message) {
-        ((Player) serverPlayer).sendSystemMessage(message);
+    public static void sendChatMessageToPlayer(ServerPlayerEntity serverPlayer, Text message) {
+        serverPlayer.sendMessage(message);
     }
 
     public static String getWordInDeclension(int value, List<String> variables) {
@@ -47,7 +45,7 @@ public class ChatMessageUtil {
         return null;
     }
 
-    public static MutableComponent getStyledComponent(String message, ChatFormatting format) {
-        return Component.literal(message).withStyle(format);
+    public static MutableText getStyledComponent(String message, Style format) {
+        return Text.literal(message).setStyle(format);
     }
 }

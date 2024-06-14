@@ -2,14 +2,11 @@ package ru.nightidk.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import ru.nightidk.DeathNote;
-import ru.nightidk.configuration.ConfigVariables;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import ru.nightidk.listeners.ModEventListener;
+import ru.nightidk.utils.TextStyleUtil;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,48 +14,51 @@ import java.util.regex.Pattern;
 import static ru.nightidk.utils.ChatMessageUtil.*;
 
 public class RestartCommand {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
-                Commands.literal("deathnote")
-                        .then(Commands.literal("cancelRestart")
-                                .requires(r -> r.hasPermission(4))
+                CommandManager.literal("deathnote")
+                        .then(CommandManager.literal("cancelRestart")
+                                .requires(r -> r.hasPermissionLevel(4))
                                 .executes(context -> {
+                                    if (context.getSource().getPlayer() == null) return -1;
                                     sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restart canceled");
                                     ModEventListener.setTickRestart(ModEventListener.tickForPlannedRestart);
                                     sendChatMessageToPlayer(context.getSource().getPlayer(),
-                                            getStyledComponent("[Оповещение]", ChatFormatting.DARK_AQUA)
-                                                    .append(getStyledComponent(" Перезагрузка, назначенная администратором, отменена. Следующая плановая перезагрузка через %s.".formatted(fromTicksToStringTime(ModEventListener.tickForPlannedRestart)), ChatFormatting.WHITE)));
+                                            getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
+                                                    .append(getStyledComponent(" Перезагрузка, назначенная администратором, отменена. Следующая плановая перезагрузка через %s.".formatted(fromTicksToStringTime(ModEventListener.tickForPlannedRestart)), TextStyleUtil.WHITE.getStyle())));
                                     ModEventListener.tickForPlannedRestart = 0;
-                                    return -1;
-                                })
-                        )
-                        .then(Commands.literal("instantRestart")
-                                .requires(r -> r.hasPermission(4))
-                                .executes(context -> {
-                                    sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restarting server...");
-                                    sendChatMessageToAll(
-                                            context.getSource().getServer().getPlayerList(),
-                                            getStyledComponent("[Оповещение]", ChatFormatting.DARK_AQUA)
-                                                    .append(getStyledComponent(" Перезагрузка сервера...", ChatFormatting.WHITE))
-                                    );
-                                    context.getSource().getServer().getPlayerList().getPlayers().forEach(serverPlayer -> serverPlayer.connection.disconnect(getStyledComponent("Перезагрузка сервера...", ChatFormatting.DARK_AQUA)));
-                                    context.getSource().getServer().halt(false);
                                     return 1;
                                 })
                         )
-                        .then(Commands.literal("restart")
-                                .requires(r -> r.hasPermission(4))
-                                .then(Commands.argument("time", StringArgumentType.string())
+                        .then(CommandManager.literal("instantRestart")
+                                .requires(r -> r.hasPermissionLevel(4))
+                                .executes(context -> {
+                                    if (context.getSource().getPlayer() == null) return -1;
+                                    sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restarting server...");
+                                    sendChatMessageToAll(
+                                            context.getSource().getServer().getPlayerManager().getPlayerList(),
+                                            getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
+                                                    .append(getStyledComponent(" Перезагрузка сервера...", TextStyleUtil.WHITE.getStyle()))
+                                    );
+                                    context.getSource().getServer().getPlayerManager().getPlayerList().forEach(serverPlayer -> serverPlayer.networkHandler.disconnect(getStyledComponent("Перезагрузка сервера...", TextStyleUtil.DARK_AQUA.getStyle())));
+                                    context.getSource().getServer().shutdown();
+                                    return 1;
+                                })
+                        )
+                        .then(CommandManager.literal("restart")
+                                .requires(r -> r.hasPermissionLevel(4))
+                                .then(CommandManager.argument("time", StringArgumentType.string())
                                         .executes(context -> {
                                             String time = context.getArgument("time", String.class);
                                             int ticks = getTimeFromString(time);
+                                            if (context.getSource().getPlayer() == null) return -1;
                                             if (ticks == -1)
-                                                sendChatMessageToPlayer(context.getSource().getPlayer(), getStyledComponent("[DeathNote] Something goes wrong.", ChatFormatting.RED));
+                                                sendChatMessageToPlayer(context.getSource().getPlayer(), getStyledComponent("[DeathNote] Something goes wrong.", TextStyleUtil.RED.getStyle()));
                                             else {
                                                 sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restarting server planned in %s.".formatted(fromTicksToStringTime(ticks)));
                                                 sendChatMessageToPlayer(context.getSource().getPlayer(),
-                                                        getStyledComponent("[Оповещение]", ChatFormatting.DARK_AQUA)
-                                                            .append(getStyledComponent(" Администратором назначена перезагрузка сервера через %s.".formatted(fromTicksToStringTime(ticks)), ChatFormatting.WHITE)));
+                                                        getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
+                                                            .append(getStyledComponent(" Администратором назначена перезагрузка сервера через %s.".formatted(fromTicksToStringTime(ticks)), TextStyleUtil.WHITE.getStyle())));
                                                 ModEventListener.tickForPlannedRestart = ModEventListener.getTickRestart();
                                                 ModEventListener.setTickRestart(ticks);
                                             }

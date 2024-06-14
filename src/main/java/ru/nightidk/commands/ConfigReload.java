@@ -1,21 +1,21 @@
 package ru.nightidk.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.Component;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 import ru.nightidk.DeathNote;
 
 public class ConfigReload {
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
-                Commands.literal("deathnote")
+                CommandManager.literal("deathnote")
                         .then(
-                                Commands.literal("reload")
-                                        .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
+                                CommandManager.literal("reload")
+                                        .requires(commandSourceStack -> commandSourceStack.hasPermissionLevel(4))
                                         .executes(context -> {
                                             DeathNote.loadConfig(DeathNote.configFile);
-                                            context.getSource().sendSystemMessage(Component.literal("[DeathNote] Config reloaded."));
+                                            context.getSource().sendMessage(Text.literal("[DeathNote] Config reloaded."));
                                             return 1;
                                         })
                         )

@@ -1,4 +1,4 @@
-package ru.nightidk.jda;
+package ru.nightidk.utils;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import ru.nightidk.DeathNote;
 import ru.nightidk.configuration.ConfigVariables;
 
-public class MessageUtil {
+public class JDAMessageUtil {
     public static void editStatusMessage(MessageEditData data) {
         TextChannel textChannel = DeathNote.jda.getTextChannelById("1250591961988206652");
         if (textChannel == null) return;
