@@ -126,7 +126,7 @@ public class ModEventListener {
             tickRestart = -1;
             shouldRestart = false;
             server.getPlayerManager().getPlayerList().forEach(serverPlayer -> serverPlayer.networkHandler.disconnect(getStyledComponent("Перезагрузка сервера...", TextStyleUtil.DARK_AQUA.getStyle())));
-            server.shutdown();
+            server.stop(false);
         }
     }
 

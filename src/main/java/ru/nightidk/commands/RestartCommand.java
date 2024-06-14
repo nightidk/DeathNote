@@ -41,7 +41,7 @@ public class RestartCommand {
                                                     .append(getStyledComponent(" Перезагрузка сервера...", TextStyleUtil.WHITE.getStyle()))
                                     );
                                     context.getSource().getServer().getPlayerManager().getPlayerList().forEach(serverPlayer -> serverPlayer.networkHandler.disconnect(getStyledComponent("Перезагрузка сервера...", TextStyleUtil.DARK_AQUA.getStyle())));
-                                    context.getSource().getServer().shutdown();
+                                    context.getSource().getServer().stop(false);
                                     return 1;
                                 })
                         )
