@@ -5,6 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import ru.nightidk.listeners.ModEventListener;
+import ru.nightidk.utils.ChatMessageUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
 import java.util.List;
@@ -23,9 +24,11 @@ public class RestartCommand {
                                     if (context.getSource().getPlayer() == null) return -1;
                                     sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restart canceled");
                                     ModEventListener.setTickRestart(ModEventListener.tickForPlannedRestart);
-                                    sendChatMessageToPlayer(context.getSource().getPlayer(),
+                                    sendChatMessageToAll(context.getSource().getServer().getPlayerManager().getPlayerList(),
                                             getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
-                                                    .append(getStyledComponent(" Перезагрузка, назначенная администратором, отменена. Следующая плановая перезагрузка через %s.".formatted(fromTicksToStringTime(ModEventListener.tickForPlannedRestart)), TextStyleUtil.WHITE.getStyle())));
+                                                    .append(getStyledComponent(" Перезагрузка, назначенная администратором, отменена. Следующая плановая перезагрузка через %s.".formatted(fromTicksToStringTime(ModEventListener.tickForPlannedRestart)), TextStyleUtil.WHITE.getStyle())),
+                                            MessageType.NOTIFY
+                                    );
                                     ModEventListener.tickForPlannedRestart = 0;
                                     return 1;
                                 })
@@ -38,7 +41,8 @@ public class RestartCommand {
                                     sendChatMessageToAll(
                                             context.getSource().getServer().getPlayerManager().getPlayerList(),
                                             getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
-                                                    .append(getStyledComponent(" Перезагрузка сервера...", TextStyleUtil.WHITE.getStyle()))
+                                                    .append(getStyledComponent(" Перезагрузка сервера...", TextStyleUtil.WHITE.getStyle())),
+                                            ChatMessageUtil.MessageType.NOTIFY
                                     );
                                     context.getSource().getServer().getPlayerManager().getPlayerList().forEach(serverPlayer -> serverPlayer.networkHandler.disconnect(getStyledComponent("Перезагрузка сервера...", TextStyleUtil.DARK_AQUA.getStyle())));
                                     context.getSource().getServer().stop(false);
@@ -56,9 +60,11 @@ public class RestartCommand {
                                                 sendChatMessageToPlayer(context.getSource().getPlayer(), getStyledComponent("[DeathNote] Something goes wrong.", TextStyleUtil.RED.getStyle()));
                                             else {
                                                 sendChatMessageToPlayer(context.getSource().getPlayer(), "[DeathNote] Restarting server planned in %s.".formatted(fromTicksToStringTime(ticks)));
-                                                sendChatMessageToPlayer(context.getSource().getPlayer(),
+                                                sendChatMessageToAll(context.getSource().getServer().getPlayerManager().getPlayerList(),
                                                         getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
-                                                            .append(getStyledComponent(" Администратором назначена перезагрузка сервера через %s.".formatted(fromTicksToStringTime(ticks)), TextStyleUtil.WHITE.getStyle())));
+                                                            .append(getStyledComponent(" Администратором назначена перезагрузка сервера через %s.".formatted(fromTicksToStringTime(ticks)), TextStyleUtil.WHITE.getStyle())),
+                                                        MessageType.NOTIFY
+                                                );
                                                 ModEventListener.tickForPlannedRestart = ModEventListener.getTickRestart();
                                                 ModEventListener.setTickRestart(ticks);
                                             }

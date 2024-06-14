@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import ru.nightidk.DeathNote;
+import ru.nightidk.utils.ChatMessageUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
 import java.util.List;
@@ -17,9 +18,10 @@ public class MessageListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getMessage().getContentStripped().isEmpty()) return;
         if (!event.getChannel().getId().equals("1250613189658411009")) return;
+        if (DeathNote.server == null) return;
         if (event.getMessage().getContentStripped().startsWith("/")) {
             String content = event.getMessage().getContentStripped();
-            String[] command = content.substring(1, content.length() - 1).split(" ");
+            String[] command = content.strip().substring(1).split(" ");
             if (command.length == 0) return;
             switch (command[0]) {
                 case "list" -> {
@@ -54,7 +56,8 @@ public class MessageListener extends ListenerAdapter {
                     getStyledComponent("[Discord]", TextStyleUtil.DARK_AQUA.getStyle())
                             .append(getStyledComponent(" %s".formatted(nickname), TextStyleUtil.DARK_AQUA.getStyle())
                                     .append(getStyledComponent(": %s".formatted(event.getMessage().getContentStripped()), TextStyleUtil.WHITE.getStyle()))
-                            )
+                            ),
+                    MessageType.DISCORD
             );
         }
     }

@@ -8,6 +8,7 @@ import net.minecraft.server.command.ServerCommandSource;
 import ru.nightidk.DeathNote;
 import ru.nightidk.configuration.ConfigVariables;
 import ru.nightidk.jda.BaseEmbed;
+import ru.nightidk.utils.ChatMessageUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
 import java.awt.*;
@@ -37,7 +38,8 @@ public class MaintanceCommand {
                                                             sendChatMessageToAll(
                                                                     context.getSource().getServer().getPlayerManager().getPlayerList(),
                                                                     getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
-                                                                            .append(getStyledComponent(" Включён режим технических работ.", TextStyleUtil.RED.getStyle()))
+                                                                            .append(getStyledComponent(" Включён режим технических работ.", TextStyleUtil.RED.getStyle())),
+                                                                    ChatMessageUtil.MessageType.NOTIFY
                                                             );
                                                             context.getSource().getServer().getPlayerManager().getPlayerList().forEach(s -> {
                                                                 if (!s.hasPermissionLevel(4))
@@ -70,7 +72,8 @@ public class MaintanceCommand {
                                                             sendChatMessageToAll(
                                                                     context.getSource().getServer().getPlayerManager().getPlayerList(),
                                                                     getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
-                                                                            .append(getStyledComponent(" Отключён режим технических работ.", TextStyleUtil.RED.getStyle()))
+                                                                            .append(getStyledComponent(" Отключён режим технических работ.", TextStyleUtil.RED.getStyle())),
+                                                                    ChatMessageUtil.MessageType.NOTIFY
                                                             );
                                                             DeathNote.LOGGER.info("[DeathNote] Maintains off.");
                                                             editStatusMessage(

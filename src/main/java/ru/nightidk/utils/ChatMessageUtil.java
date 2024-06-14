@@ -14,7 +14,14 @@ import java.util.ListIterator;
 import static ru.nightidk.utils.JDAMessageUtil.sendChatMessage;
 
 public class ChatMessageUtil {
-    public static void sendChatMessageToAll(List<ServerPlayerEntity> playerList, Text message) {
+    public enum MessageType {
+        NOTIFY,
+        DISCORD,
+        CLEAN,
+        RESTART
+    }
+
+    public static void sendChatMessageToAll(List<ServerPlayerEntity> playerList, Text message, MessageType type) {
         ListIterator<ServerPlayerEntity> iterator = playerList.listIterator();
         while(true)
         {
@@ -26,15 +33,16 @@ public class ChatMessageUtil {
             else break;
         }
         DeathNote.LOGGER.info("[DeathNote] {}", message.getString());
-        sendChatMessage("1250613189658411009",
-                new MessageCreateBuilder()
-                        .setContent(message.getString())
-                        .build()
-        );
+        if (type == MessageType.NOTIFY)
+            sendChatMessage("1250613189658411009",
+                    new MessageCreateBuilder()
+                            .setContent(message.getString())
+                            .build()
+            );
     }
 
-    public static void sendChatMessageToAll(List<ServerPlayerEntity> source, String message) {
-        sendChatMessageToAll(source, Text.literal(message));
+    public static void sendChatMessageToAll(List<ServerPlayerEntity> source, String message, MessageType type) {
+        sendChatMessageToAll(source, Text.literal(message), type);
     }
 
     public static void sendChatMessageToPlayer(ServerPlayerEntity serverPlayer, String message) {
