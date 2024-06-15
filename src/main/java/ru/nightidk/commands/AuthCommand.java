@@ -8,8 +8,6 @@ import net.minecraft.server.command.ServerCommandSource;
 import ru.nightidk.utils.AuthUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 import static ru.nightidk.utils.AuthUtil.*;

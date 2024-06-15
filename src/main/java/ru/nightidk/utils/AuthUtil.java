@@ -12,7 +12,6 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -43,7 +42,7 @@ public class AuthUtil {
         element.addProperty("password", md5(password));
         element.addProperty("uuid", uuid);
         AuthVariables.JSON_AUTH.get("users").getAsJsonArray().add(element);
-        DeathNote.saveAuth(DeathNote.authFile);
+        ConfigUtils.saveAuth(DeathNote.authFile);
     }
 
     public static boolean isAuthorized(ServerPlayerEntity player) {

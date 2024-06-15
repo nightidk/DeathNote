@@ -9,6 +9,7 @@ import ru.nightidk.DeathNote;
 import ru.nightidk.configuration.ConfigVariables;
 import ru.nightidk.jda.BaseEmbed;
 import ru.nightidk.utils.ChatMessageUtil;
+import ru.nightidk.utils.ConfigUtils;
 import ru.nightidk.utils.TextStyleUtil;
 
 import java.awt.*;
@@ -30,7 +31,7 @@ public class MaintanceCommand {
                                                         .executes(context -> {
                                                             ConfigVariables.MAINTANCE = true;
                                                             try {
-                                                                DeathNote.saveConfig(DeathNote.configFile);
+                                                                ConfigUtils.saveConfig(DeathNote.configFile);
                                                             } catch (IOException e) {
                                                                 e.printStackTrace();
                                                             }
@@ -65,7 +66,7 @@ public class MaintanceCommand {
                                                         .executes(context -> {
                                                             ConfigVariables.MAINTANCE = false;
                                                             try {
-                                                                DeathNote.saveConfig(DeathNote.configFile);
+                                                                ConfigUtils.saveConfig(DeathNote.configFile);
                                                             } catch (IOException e) {
                                                                 e.printStackTrace();
                                                             }

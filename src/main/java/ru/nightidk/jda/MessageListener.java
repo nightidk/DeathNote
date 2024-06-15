@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.minecraft.server.network.ServerPlayerEntity;
 import ru.nightidk.DeathNote;
-import ru.nightidk.utils.ChatMessageUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
 import java.util.List;

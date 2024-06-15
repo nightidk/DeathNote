@@ -1,6 +1,5 @@
 package ru.nightidk.listeners;
 
-import dev.architectury.event.EventResult;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -11,7 +10,6 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.message.MessageType;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.server.MinecraftServer;
@@ -20,7 +18,6 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.TypeFilter;
-import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 import ru.nightidk.DeathNote;
 import ru.nightidk.configuration.ConfigVariables;
@@ -68,7 +65,6 @@ public class ModEventListener {
                         .append(getStyledComponent(" Очищено " + entityList.size() + " " + getWordInDeclension(entityList.size(), List.of("предмет", "предмета", "предметов")) + ".", TextStyleUtil.WHITE.getStyle())),
                 ChatMessageUtil.MessageType.CLEAN
         );
-        DeathNote.LOGGER.info("[DeathNote] Очищено {} {}.", entityList.size(), getWordInDeclension(entityList.size(), List.of("предмет", "предмета", "предметов")));
         entityList.forEach(Entity::discard);
         tickClean = ConfigVariables.TICK_FOR_CLEAN;
     }
@@ -76,10 +72,7 @@ public class ModEventListener {
     public static void restartServerTickEvent(MinecraftServer server) {
         if (tickRestart == -1) return;
 
-
-
         tickRestart--;
-
 
         int seconds = tickRestart / 20;
         int minutes = seconds / 60;
@@ -87,7 +80,7 @@ public class ModEventListener {
 
         if (hours != 0) return;
 
-        if (minutes > 0 && (minutes % 10 == 0 || minutes == 1 || minutes == 5) && tickRestart % 20 == 0 && seconds >= 60) {
+        if (minutes > 0 && (minutes % 10 == 0 || minutes == 1 || minutes == 5) && tickRestart % 20 == 0 && seconds >= 60 && seconds % 60 == 0) {
             sendChatMessageToAll(
                     server.getPlayerManager().getPlayerList(),
                     getStyledComponent("[Оповещение]", TextStyleUtil.DARK_AQUA.getStyle())
@@ -140,6 +133,7 @@ public class ModEventListener {
     }
 
     public static void serverStoppingEvent(MinecraftServer server) {
+        if (DeathNote.jda == null) return;
         TextChannel textChannel = DeathNote.jda.getTextChannelById("1250591961988206652");
         if (textChannel != null) {
             textChannel.editMessageById(ConfigVariables.DISCORD_STATUS_MESSAGE, new MessageEditBuilder()
@@ -168,6 +162,7 @@ public class ModEventListener {
                         )
                 ).build()
         );
+        if (DeathNote.jda == null) return;
         DeathNote.LOGGER.info( "[DeathNote] JDA logout." );
         DeathNote.jda.shutdown();
         DeathNote.jda.awaitShutdown();
@@ -203,8 +198,11 @@ public class ModEventListener {
     }
 
     public static void joinedServerEvent(ServerPlayNetworkHandler serverGamePacketListener, PacketSender packetSender, MinecraftServer server) {
-        if (ConfigVariables.MAINTANCE) return;
         ServerPlayerEntity serverPlayer = serverGamePacketListener.getPlayer();
+        if (ConfigVariables.MAINTANCE) {
+            setAuthorized(serverPlayer, true);
+            return;
+        }
 
         setAuthorized(serverPlayer, false);
         sendChatMessageToPlayer(serverPlayer, getAuthMessage(serverPlayer));
@@ -229,7 +227,6 @@ public class ModEventListener {
     public static boolean allowChatMessage(SignedMessage playerChatMessage, ServerPlayerEntity player, MessageType.Parameters params) {
         if (player == null) return true;
         if (!isAuthorized(player)) {
-//            sendChatMessageToPlayer(player, getAuthMessage(player));
             return false;
         }
         return true;
@@ -240,7 +237,6 @@ public class ModEventListener {
         ServerPlayerEntity serverPlayer = player.getWorld().getServer().getPlayerManager().getPlayer(player.getName().getString());
         if (serverPlayer == null) return ActionResult.PASS;
         if (!isAuthorized((ServerPlayerEntity) player)) {
-//            sendChatMessageToPlayer((ServerPlayerEntity) player, getAuthMessage((ServerPlayerEntity) player));
             return ActionResult.FAIL;
         }
         return ActionResult.PASS;
@@ -251,7 +247,6 @@ public class ModEventListener {
         ServerPlayerEntity serverPlayer = player.getWorld().getServer().getPlayerManager().getPlayer(player.getName().getString());
         if (serverPlayer == null) return ActionResult.PASS;
         if (!isAuthorized((ServerPlayerEntity) player)) {
-//            sendChatMessageToPlayer((ServerPlayerEntity) player, getAuthMessage((ServerPlayerEntity) player));
             return ActionResult.FAIL;
         }
         return ActionResult.PASS;

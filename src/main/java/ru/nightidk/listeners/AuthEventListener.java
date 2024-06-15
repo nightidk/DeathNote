@@ -14,9 +14,7 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import static ru.nightidk.utils.AuthUtil.getAuthMessage;
 import static ru.nightidk.utils.AuthUtil.isAuthorized;
-import static ru.nightidk.utils.ChatMessageUtil.sendChatMessageToPlayer;
 
 public class AuthEventListener {
     public static ActionResult useEntityEvent(PlayerEntity player, World level, Hand interactionHand, Entity entity, EntityHitResult entityHitResult) {
