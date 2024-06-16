@@ -1,4 +1,4 @@
-package ru.nightidk.listeners;
+package ru.nightidk.listeners.serverside;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;

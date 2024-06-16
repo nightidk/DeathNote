@@ -18,8 +18,8 @@ import ru.nightidk.commands.RestartCommand;
 import ru.nightidk.configuration.ConfigVariables;
 import ru.nightidk.jda.BaseEmbed;
 import ru.nightidk.jda.MessageListener;
-import ru.nightidk.listeners.AuthEventListener;
-import ru.nightidk.listeners.ModEventListener;
+import ru.nightidk.listeners.serverside.AuthEventListener;
+import ru.nightidk.listeners.serverside.ModEventListener;
 
 import java.awt.*;
 import java.io.File;

@@ -19,6 +19,8 @@ import java.io.*;
 
 public class DeathNote implements ModInitializer {
 
+	public static final String MOD_ID = "deathnote";
+
 	@Getter
 	@Setter
 	protected static EnvType envType;

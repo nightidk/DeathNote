@@ -1,6 +1,7 @@
 package ru.nightidk.mixin;
 
 
+import net.fabricmc.api.EnvType;
 import net.minecraft.network.packet.c2s.play.ChatMessageC2SPacket;
 import net.minecraft.network.packet.c2s.play.CreativeInventoryActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
@@ -13,7 +14,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.nightidk.listeners.AuthEventListener;
+import ru.nightidk.DeathNote;
+import ru.nightidk.listeners.serverside.AuthEventListener;
 
 import static net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND;
 
@@ -32,6 +34,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             cancellable = true
     )
     private void onPlayerAction(PlayerActionC2SPacket packet, CallbackInfo ci) {
+        if (DeathNote.getEnvType() == EnvType.CLIENT) return;
         if (packet.getAction() == SWAP_ITEM_WITH_OFFHAND) {
             ActionResult result = AuthEventListener.onPlayerAction(this.player);
             if (result == ActionResult.FAIL)
@@ -49,6 +52,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             cancellable = true
     )
     private void onPlayerMove(PlayerMoveC2SPacket packet, CallbackInfo ci) {
+        if (DeathNote.getEnvType() == EnvType.CLIENT) return;
         ActionResult result = AuthEventListener.onPlayerMove(this.player);
         if (result == ActionResult.FAIL)
             ci.cancel();
@@ -63,6 +67,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             cancellable = true
     )
     private void onSetCreateMoveSlot(CreativeInventoryActionC2SPacket packet, CallbackInfo ci) {
+        if (DeathNote.getEnvType() == EnvType.CLIENT) return;
         ActionResult result = AuthEventListener.onPlayerTakeItem(this.player);
         if (result == ActionResult.FAIL)
             ci.cancel();
@@ -78,6 +83,7 @@ public abstract class ServerPlayNetworkHandlerMixin {
             cancellable = true
     )
     private void onChatMessage(ChatMessageC2SPacket packet, CallbackInfo ci) {
+        if (DeathNote.getEnvType() == EnvType.CLIENT) return;
         ActionResult result = AuthEventListener.onPlayerChat(this.player);
         if (result == ActionResult.FAIL)
             ci.cancel();

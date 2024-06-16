@@ -1,4 +1,4 @@
-package ru.nightidk.listeners;
+package ru.nightidk.listeners.serverside;
 
 import lombok.Getter;
 import lombok.Setter;

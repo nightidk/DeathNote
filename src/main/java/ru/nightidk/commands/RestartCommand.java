@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
-import ru.nightidk.listeners.ModEventListener;
+import ru.nightidk.listeners.serverside.ModEventListener;
 import ru.nightidk.utils.ChatMessageUtil;
 import ru.nightidk.utils.TextStyleUtil;
 
