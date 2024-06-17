@@ -10,7 +10,7 @@ import ru.nightidk.items.*;
 public class ItemRegister {
     public static final Item INFINITY_INGOT = new InfinityIngot();
     public static final Item INFINITY_HELMET = new InfinityHelmet();
-    public static final Item INFINITY_CHESTPLATE = new InfinityChestPlate();
+    public static final Item INFINITY_CHESTPLATE = new InfinityChestplate();
     public static final Item INFINITY_LEGGINGS = new InfinityLeggings();
     public static final Item INFINITY_BOOTS = new InfinityBoots();
 

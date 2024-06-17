@@ -19,24 +19,4 @@ public class InfinityBoots extends InfinityArmor {
         super(INFINITY_MATERIAL, Type.BOOTS, new Settings().maxCount(1).rarity(Rarity.EPIC));
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-
-
-        if (!world.isClient()) {
-            if (!(entity instanceof ServerPlayerEntity player)) return;
-            boolean wear = wearThisItem(player, this);
-            if (!wear) {
-                player.removeStatusEffect(StatusEffects.JUMP_BOOST);
-                return;
-            }
-
-        } else {
-            if (!(entity instanceof PlayerEntity player)) return;
-            boolean wear = wearThisItem(player, this);
-            if (!wear) player.setStepHeight(0.6F);
-            else player.setStepHeight(1.0F);
-        }
-        super.inventoryTick(stack, world, entity, slot, selected);
-    }
 }

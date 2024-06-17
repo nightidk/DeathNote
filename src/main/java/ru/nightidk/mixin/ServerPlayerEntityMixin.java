@@ -39,6 +39,7 @@ public class ServerPlayerEntityMixin {
 
     @Inject(method = "playerTick()V", at = @At("HEAD"), cancellable = true)
     private void playerTick(CallbackInfo ci) {
+        ModClientOrServerEventListener.serverArmorCheck(player);
         ActionResult result = ModClientOrServerEventListener.playerInFire(player);
         if (player.isOnFire())
             if (result == ActionResult.FAIL)

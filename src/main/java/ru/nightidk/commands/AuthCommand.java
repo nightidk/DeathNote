@@ -20,7 +20,7 @@ public class AuthCommand {
         final LiteralCommandNode<ServerCommandSource> login = dispatcher.register(
                 CommandManager.literal("login")
                         .then(CommandManager.argument("password", StringArgumentType.string())
-                                .requires(s -> isRegistered(s.getName()) && s.isExecutedByPlayer())
+                                .requires(s -> s.getPlayer() != null && !isAuthorized(s.getPlayer()) && isRegistered(s.getName()) && s.isExecutedByPlayer())
                                 .executes(context -> {
                                     String password = context.getArgument("password", String.class);
                                     if (context.getSource().getPlayer() == null) return -1;
@@ -44,7 +44,7 @@ public class AuthCommand {
                 CommandManager.literal("register")
                         .then(CommandManager.argument("password", StringArgumentType.string())
                                 .then(CommandManager.argument("repeatPassword", StringArgumentType.string())
-                                    .requires(s -> !isRegistered(s.getName()) && s.isExecutedByPlayer())
+                                    .requires(s -> s.getPlayer() != null && !isAuthorized(s.getPlayer()) && !isRegistered(s.getName()) && s.isExecutedByPlayer())
                                     .executes(context -> {
                                         String password = context.getArgument("password", String.class);
                                         String repeatPassword = context.getArgument("repeatPassword", String.class);

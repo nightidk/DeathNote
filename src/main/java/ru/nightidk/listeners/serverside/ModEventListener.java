@@ -192,6 +192,7 @@ public class ModEventListener {
                         )
                 ).build()
         );
+        if (ConfigVariables.MAINTANCE) return;
         sendChatMessage("1250613189658411009", new MessageCreateBuilder().setContent(
                 "[SYSTEM] Сервер запущен."
         ).build());
@@ -209,6 +210,8 @@ public class ModEventListener {
 
         serverGamePacketListener.getPlayer().setInvisible(true);
         serverGamePacketListener.getPlayer().setInvulnerable(true);
+
+        if (ConfigVariables.MAINTANCE) return;
 
         sendChatMessage("1250613189658411009", new MessageCreateBuilder().setContent(
                 "[SYSTEM] " + serverPlayer.getName().getString() + " зашёл на сервер."

@@ -1,37 +1,47 @@
 package ru.nightidk.items;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.effect.StatusEffect;
+import io.github.ladysnake.pal.AbilitySource;
+import io.github.ladysnake.pal.Pal;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.command.EffectCommand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.Rarity;
-import net.minecraft.world.World;
+import ru.nightidk.DeathNote;
+import ru.nightidk.items.abilities.InfinityAbilities;
 import ru.nightidk.items.base.InfinityArmor;
 
 import static ru.nightidk.register.MaterialRegister.INFINITY_MATERIAL;
 
 public class InfinityHelmet extends InfinityArmor {
+
+    private static final Identifier INFINITY_HELMET_ABILITY_SOURCE_ID = new Identifier(DeathNote.MOD_ID, "infinity_helmet");
+    private static final AbilitySource INFINITY_HELMET_ABILITY_SOURCE = Pal.getAbilitySource(INFINITY_HELMET_ABILITY_SOURCE_ID);
+
     public InfinityHelmet() {
         super(INFINITY_MATERIAL, Type.HELMET, new Settings().maxCount(1).rarity(Rarity.EPIC));
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (!world.isClient()) {
-            if (!(entity instanceof PlayerEntity player)) return;
-            boolean wear = wearThisItem(player, this);
-            if (!wear) {
-                player.removeStatusEffect(StatusEffects.NIGHT_VISION);
-                return;
-            }
+    public static boolean isAllowingNightVision(PlayerEntity player) {
+        return INFINITY_HELMET_ABILITY_SOURCE.grants(player, InfinityAbilities.NIGHT_VISION) && INFINITY_HELMET_ABILITY_SOURCE.isActivelyGranting(player, InfinityAbilities.NIGHT_VISION);
+    }
+
+    public static void allowNightVision(PlayerEntity playerEntity) {
+        if (!playerEntity.getWorld().isClient()) {
+            INFINITY_HELMET_ABILITY_SOURCE.grantTo(playerEntity, InfinityAbilities.NIGHT_VISION);
+            if (playerEntity.hasStatusEffect(StatusEffects.NIGHT_VISION))
+                playerEntity.removeStatusEffect(StatusEffects.NIGHT_VISION);
             StatusEffectInstance statusEffectInstance = new StatusEffectInstance(StatusEffects.NIGHT_VISION, -1, 0, false, false, false);
-            StatusEffectInstance statusEffect = player.getStatusEffect(StatusEffects.NIGHT_VISION);
+            StatusEffectInstance statusEffect = playerEntity.getStatusEffect(StatusEffects.NIGHT_VISION);
             if (statusEffect == null)
-                player.addStatusEffect(statusEffectInstance, null);
+                playerEntity.addStatusEffect(statusEffectInstance, null);
         }
-        super.inventoryTick(stack, world, entity, slot, selected);
+    }
+
+    public static void dontAllowNightVision(PlayerEntity playerEntity) {
+        if (!playerEntity.getWorld().isClient()) {
+            INFINITY_HELMET_ABILITY_SOURCE.revokeFrom(playerEntity, InfinityAbilities.NIGHT_VISION);
+            playerEntity.removeStatusEffect(StatusEffects.NIGHT_VISION);
+        }
     }
 }

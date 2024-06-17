@@ -1,7 +1,7 @@
 package ru.nightidk.logic;
 
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import ru.nightidk.DeathNote;
+import ru.nightidk.items.abilities.InfinityAbilities;
 import ru.nightidk.register.CreativeTabRegister;
 import ru.nightidk.register.ItemRegister;
 
@@ -9,6 +9,8 @@ import static ru.nightidk.DeathNote.LOGGER;
 
 public class BothLoadLogic {
     public static void onClientOrServerLoad() {
+        InfinityAbilities.init();
+        LOGGER.info("[DeathNote] Abilities initialized.");
         ItemRegister.register();
         LOGGER.info("[DeathNote] Registered items.");
         CreativeTabRegister.register();

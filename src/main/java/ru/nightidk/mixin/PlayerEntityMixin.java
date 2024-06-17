@@ -3,24 +3,30 @@ package ru.nightidk.mixin;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
+import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.nightidk.items.InfinityBoots;
+import ru.nightidk.items.abilities.InfinityAbilitiesProps;
+import ru.nightidk.items.abilities.InfinityAbilitiesContainer;
+import ru.nightidk.listeners.both.ModClientOrServerEventListener;
 
 @Mixin(PlayerEntity.class)
-public abstract class PlayerEntityMixin extends LivingEntity {
+public abstract class PlayerEntityMixin extends LivingEntity implements InfinityAbilitiesContainer {
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);
@@ -31,6 +37,14 @@ public abstract class PlayerEntityMixin extends LivingEntity {
     @Shadow public abstract void incrementStat(Identifier stat);
 
     @Shadow public abstract void addExhaustion(float exhaustion);
+
+    @Shadow @Final private PlayerAbilities abilities;
+
+    @Unique
+    private final InfinityAbilitiesProps infAbilities = new InfinityAbilitiesProps();
+
+    @Unique
+    private final PlayerEntity player = (PlayerEntity) (Object) this;
 
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     public void jump(CallbackInfo ci) {
@@ -54,5 +68,26 @@ public abstract class PlayerEntityMixin extends LivingEntity {
                 addExhaustion(0.05F);
             }
         }
+    }
+
+    @Inject(method = "tick", at = @At("HEAD"))
+    public void tick(CallbackInfo ci) {
+        ModClientOrServerEventListener.clientArmorCheck(player);
+    }
+
+    @Unique
+    @Override
+    public InfinityAbilitiesProps deathNote$getInfinityAbilities() {
+        return this.infAbilities;
+    }
+
+    @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))
+    private void onWriteEntityToNBT(NbtCompound nbt, CallbackInfo ci) {
+        this.infAbilities.writeNbt(nbt);
+    }
+
+    @Inject(method = "readCustomDataFromNbt", at = @At("TAIL"))
+    private void onReadEntityFromNBT(NbtCompound nbt, CallbackInfo ci) {
+        this.infAbilities.readNbt(nbt);
     }
 }
