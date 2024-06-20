@@ -1,0 +1,13 @@
+{
+  "render_type": "cutout",
+  "parent": "block/cube",
+  "textures": {
+    "north": "deathnote:block/table/extreme_side",
+    "east": "deathnote:block/table/extreme_side",
+    "south": "deathnote:block/table/extreme_side",
+    "west": "deathnote:block/table/extreme_side",
+    "up": "deathnote:block/table/extreme_top",
+    "down": "deathnote:block/table/crystal_matrix",
+    "particle": "deathnote:block/table/crystal_matrix"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "type": "deathnote:special",
+  "pattern": [
+    "X Y      ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "         ",
+    "      Y  ",
+    "X        "
+  ],
+  "key": {
+    "X": {
+      "item": "minecraft:apple",
+      "nbt": {}
+    },
+    "Y": {
+      "item": "minecraft:gold_ingot",
+      "nbt": {}
+    }
+  },
+  "output": {
+    "item": "minecraft:golden_apple",
+    "count": 1
+  }
+}

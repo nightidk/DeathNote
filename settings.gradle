@@ -5,6 +5,7 @@ pluginManagement {
 		maven { url "https://maven.architectury.dev/" }
 		maven { url "https://files.minecraftforge.net/maven/" }
 		maven { url "https://maven.nucleoid.xyz" }
+		maven { url "https://maven2.bai.lol" }
 		gradlePluginPortal()
 	}
 }

@@ -1,0 +1,10 @@
+{
+  "type": "botania:mana_infusion",
+  "input": {
+    "item": "deathnote:poisoned_matrix_ingot"
+  },
+  "mana": 6000,
+  "output": {
+    "item": "deathnote:clean_matrix_ingot"
+  }
+}
